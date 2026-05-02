@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doria Creative Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --navy:    #072150;
+  --pacific: #72A5D4;
+  --horizon: #F5F4DF;
+  --copper:  #BA543D;
+  --iron:    #332C29;
+  --white:   #ffffff;
+}
+
+body {
+  background: #05111f;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(114,165,212,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 80%, rgba(7,33,80,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 0% 60%, rgba(114,165,212,0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  padding: 64px 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.logo-mark {
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(114,165,212,0.6);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.brand-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-align: center;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.brand-title em {
+  font-style: italic;
+  color: var(--pacific);
+}
+
+.brand-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  max-width: 480px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(114,165,212,0.3), transparent);
+  margin-bottom: 14px;
+}
+
+.studio-label {
+  font-size: 8px;
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+/* ── GRID ── */
+.grid {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+/* ── CARD ── */
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 4px;
+  padding: 28px 24px 24px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(114,165,212,0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card:hover {
+  background: rgba(114,165,212,0.06);
+  border-color: rgba(114,165,212,0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(7,33,80,0.4);
+}
+.card:hover::before { opacity: 1; }
+
+.card.disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.card.disabled:hover {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.07);
+  transform: none;
+  box-shadow: none;
+}
+.card.disabled:hover::before { opacity: 0; }
+
+/* Card icon */
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  background: rgba(114,165,212,0.1);
+  border: 1px solid rgba(114,165,212,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  font-size: 18px;
+}
+
+.card-num {
+  font-size: 8px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(114,165,212,0.5);
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.card-desc {
+  font-size: 11px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.4);
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.tag {
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(114,165,212,0.25);
+  color: rgba(114,165,212,0.7);
+}
+.tag.active {
+  background: rgba(114,165,212,0.12);
+  border-color: rgba(114,165,212,0.4);
+  color: var(--pacific);
+}
+.tag.beta {
+  border-color: rgba(186,84,61,0.35);
+  color: rgba(186,84,61,0.8);
+  background: rgba(186,84,61,0.08);
+}
+.tag.soon {
+  border-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.25);
+}
+
+/* Card arrow */
+.card-arrow {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  font-size: 14px;
+  color: rgba(114,165,212,0.3);
+  transition: all 0.2s;
+}
+.card:not(.disabled):hover .card-arrow {
+  color: var(--pacific);
+  transform: translate(2px, -2px);
+}
+
+/* ── COMING SOON OVERLAY ── */
+.coming-soon-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 7.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+/* ── FOOTER ── */
+footer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  padding: 24px 32px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top: 8px;
+}
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.footer-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+}
+.footer-meta {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.15);
+  text-transform: uppercase;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+  .brand-title { font-size: 38px; }
+  header { padding: 48px 20px 0; }
+  .grid { padding: 0 20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Logo mark -->
+  <div class="logo-mark">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="26" cy="26" r="24.5" stroke="rgba(114,165,212,0.4)" stroke-width="1"/>
+      <circle cx="26" cy="26" r="19" stroke="rgba(114,165,212,0.15)" stroke-width="0.5"/>
+      <path d="M26 8 L28 24 L44 26 L28 28 L26 44 L24 28 L8 26 L24 24 Z"
+            fill="rgba(114,165,212,0.9)"/>
+      <!-- small dots -->
+      <circle cx="26" cy="10" r="1" fill="rgba(114,165,212,0.4)"/>
+      <circle cx="42" cy="26" r="1" fill="rgba(114,165,212,0.4)"/>
+      <circle cx="26" cy="42" r="1" fill="rgba(114,165,212,0.4)"/>
+      <circle cx="10" cy="26" r="1" fill="rgba(114,165,212,0.4)"/>
+    </svg>
+  </div>
+
+  <p class="eyebrow">Doria Coffee Roasters & Co.</p>
+  <h1 class="brand-title"><em>Creative</em> Studio</h1>
+  <p class="brand-sub">Herramientas de contenido · Playas de Tijuana</p>
+
+  <div class="divider"></div>
+  <p class="studio-label">Selecciona una herramienta</p>
+</header>
+
+<!-- ── GRID ── -->
+<div class="grid">
+
+  <!-- Card 1: Generador de Carruseles -->
+  <a class="card" href="pink-lemonade-coco-carousel.html">
+    <div class="card-icon">◫</div>
+    <p class="card-num">01</p>
+    <h2 class="card-title">Generador de Carruseles</h2>
+    <p class="card-desc">Carga tus fotos, personaliza el diseño y descarga los slides listos para Instagram.</p>
+    <div class="tags">
+      <span class="tag active">Instagram</span>
+      <span class="tag active">1:1</span>
+      <span class="tag active">3 slides</span>
+    </div>
+    <span class="card-arrow">↗</span>
+  </a>
+
+  <!-- Card 2: Generador de Imágenes -->
+  <div class="card disabled">
+    <span class="coming-soon-badge">Próximamente</span>
+    <div class="card-icon" style="opacity:.5">⊞</div>
+    <p class="card-num">02</p>
+    <h2 class="card-title">Generador de Imágenes</h2>
+    <p class="card-desc">Crea piezas visuales optimizadas para cada formato de red social.</p>
+    <div class="tags">
+      <span class="tag soon">9:16</span>
+      <span class="tag soon">4:5</span>
+      <span class="tag soon">3:4</span>
+      <span class="tag soon">1:1</span>
+    </div>
+  </div>
+
+  <!-- Card 3: Generador de Clips -->
+  <div class="card disabled">
+    <span class="coming-soon-badge">Beta</span>
+    <div class="card-icon" style="opacity:.5; border-color:rgba(186,84,61,0.3); background:rgba(186,84,61,0.08);">▷</div>
+    <p class="card-num">03</p>
+    <h2 class="card-title">Generador de Clips</h2>
+    <p class="card-desc">Genera animaciones y clips de video para stories, reels y TikTok.</p>
+    <div class="tags">
+      <span class="tag beta">Beta</span>
+      <span class="tag soon">Stories</span>
+      <span class="tag soon">Reels</span>
+      <span class="tag soon">TikTok</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-brand">
+    <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="15" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <path d="M16 5 L17.4 14.6 L27 16 L17.4 17.4 L16 27 L14.6 17.4 L5 16 L14.6 14.6 Z"
+            fill="rgba(255,255,255,0.25)"/>
+    </svg>
+    <span class="footer-name">Doria</span>
+  </div>
+  <span class="footer-meta">@doria.cafe · 2026</span>
+</footer>
+
+</body>
+</html>
