@@ -933,6 +933,19 @@ async function convertToMp4() {
   const convertFill = document.getElementById('convert-fill');
   const convertLabel = document.getElementById('convert-label');
 
+  // GitHub Pages no soporta los Workers de ffmpeg.wasm
+  const isGitHubPages = location.hostname.endsWith('github.io');
+  if (isGitHubPages) {
+    convertWrap.style.display = 'flex';
+    convertFill.style.width = '100%';
+    convertFill.style.background = 'rgba(114,165,212,.35)';
+    convertLabel.innerHTML = '⚠ Conversión no disponible en GitHub Pages.<br>Opciones: <a href="https://handbrake.fr" target="_blank" style="color:var(--accent);">HandBrake</a> (gratis) · <a href="https://cloudconvert.com/webm-to-mp4" target="_blank" style="color:var(--accent);">CloudConvert</a> · o abre este archivo desde tu computadora.';
+    convertLabel.style.lineHeight = '1.6';
+    btnConvert.disabled = false;
+    btnConvert.textContent = '🎞 Convertir a MP4';
+    return;
+  }
+
   btnConvert.disabled = true;
   btnConvert.textContent = '⏳ Convirtiendo…';
   convertWrap.style.display = 'flex';
