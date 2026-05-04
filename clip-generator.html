@@ -465,17 +465,12 @@
 
         <div class="divider" style="margin: 4px 0;"></div>
 
-        <!-- Convert to MP4 -->
-        <button class="btn btn-outline btn-full" id="btn-convert" onclick="convertToMp4()">
-          🎞 Convertir a MP4
-        </button>
-
-        <!-- Convert progress -->
-        <div class="progress-wrap" id="convert-wrap" style="margin-top:8px;">
-          <div class="progress-bar">
-            <div class="progress-fill" id="convert-fill"></div>
-          </div>
-          <div class="progress-label" id="convert-label">Cargando FFmpeg…</div>
+        <!-- Convert to MP4 info -->
+        <a href="https://cloudconvert.com/webm-to-mp4" target="_blank" class="btn btn-outline btn-full">
+          🎞 Convertir a MP4 →
+        </a>
+        <div style="text-align:center; font-size:10px; color:var(--muted); letter-spacing:.5px; margin-top:2px;">
+          Abre CloudConvert · arrastra tu .webm · descarga el .mp4
         </div>
 
         <button class="btn btn-outline btn-full" onclick="resetDownload()">
@@ -908,122 +903,9 @@ async function startRender() {
 
 function resetDownload() {
   document.getElementById('download-wrap').style.display = 'none';
-  document.getElementById('convert-wrap').style.display = 'none';
-  document.getElementById('convert-fill').style.width = '0%';
-  document.getElementById('btn-convert').disabled = false;
-  document.getElementById('btn-convert').textContent = '🎞 Convertir a MP4';
   _webmBlob = null;
   document.getElementById('preview-state').textContent = 'Listo';
   drawPreviewFrame(0);
-}
-
-// ─────────────────────────────────────────────
-//  CONVERT TO MP4 (ffmpeg.wasm)
-// ─────────────────────────────────────────────
-let _ffmpegLoaded = false;
-let _ffmpegInstance = null;
-
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = resolve;
-    s.onerror = () => reject(new Error('No se pudo cargar: ' + src));
-    document.head.appendChild(s);
-  });
-}
-
-async function convertToMp4() {
-  if (!_webmBlob) return;
-
-  const btnConvert = document.getElementById('btn-convert');
-  const convertWrap = document.getElementById('convert-wrap');
-  const convertFill = document.getElementById('convert-fill');
-  const convertLabel = document.getElementById('convert-label');
-
-  // GitHub Pages no soporta los Workers de ffmpeg.wasm
-  const isGitHubPages = location.hostname.endsWith('github.io');
-  if (isGitHubPages) {
-    convertWrap.style.display = 'flex';
-    convertFill.style.width = '100%';
-    convertFill.style.background = 'rgba(114,165,212,.35)';
-    convertLabel.innerHTML = '⚠ Conversión no disponible en GitHub Pages.<br>Opciones: <a href="https://handbrake.fr" target="_blank" style="color:var(--accent);">HandBrake</a> (gratis) · <a href="https://cloudconvert.com/webm-to-mp4" target="_blank" style="color:var(--accent);">CloudConvert</a> · o abre este archivo desde tu computadora.';
-    convertLabel.style.lineHeight = '1.6';
-    btnConvert.disabled = false;
-    btnConvert.textContent = '🎞 Convertir a MP4';
-    return;
-  }
-
-  btnConvert.disabled = true;
-  btnConvert.textContent = '⏳ Convirtiendo…';
-  convertWrap.style.display = 'flex';
-  convertFill.style.width = '0%';
-  convertLabel.textContent = 'Cargando FFmpeg (primera vez tarda ~10s)…';
-
-  try {
-    // Cargar scripts dinámicamente si aún no están cargados
-    if (!window.FFmpegWASM) {
-      await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js');
-    }
-    if (!window.FFmpegUtil) {
-      await loadScript('https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js');
-    }
-
-    const { FFmpeg } = FFmpegWASM;
-    const { fetchFile, toBlobURL } = FFmpegUtil;
-
-    if (!_ffmpegInstance) {
-      _ffmpegInstance = new FFmpeg();
-    }
-    const ffmpeg = _ffmpegInstance;
-
-    ffmpeg.on('progress', ({ progress }) => {
-      const pct = Math.min(Math.round(progress * 100), 99);
-      convertFill.style.width = pct + '%';
-      convertLabel.textContent = `Convirtiendo… ${pct}%`;
-    });
-
-    if (!_ffmpegLoaded) {
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-      await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      });
-      _ffmpegLoaded = true;
-    }
-
-    convertLabel.textContent = 'Procesando video…';
-    await ffmpeg.writeFile('input.webm', await fetchFile(_webmBlob));
-    await ffmpeg.exec([
-      '-i', 'input.webm',
-      '-c:v', 'libx264',
-      '-preset', 'fast',
-      '-crf', '20',
-      '-pix_fmt', 'yuv420p',
-      '-movflags', '+faststart',
-      'output.mp4'
-    ]);
-
-    const data = await ffmpeg.readFile('output.mp4');
-    const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
-    const mp4Url = URL.createObjectURL(mp4Blob);
-
-    const baseName = document.getElementById('download-name').textContent.replace('.webm', '');
-    const a = document.createElement('a');
-    a.href = mp4Url;
-    a.download = baseName + '.mp4';
-    a.click();
-
-    convertFill.style.width = '100%';
-    convertLabel.textContent = '✓ MP4 descargado correctamente';
-    btnConvert.textContent = '✓ Convertido';
-
-  } catch (err) {
-    console.error(err);
-    convertLabel.textContent = '⚠ Error: ' + (err.message || 'intenta de nuevo');
-    btnConvert.disabled = false;
-    btnConvert.textContent = '🎞 Reintentar conversión';
-  }
 }
 
 // ─────────────────────────────────────────────
