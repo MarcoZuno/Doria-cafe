@@ -841,13 +841,24 @@ async function startRender() {
   const totalContentFrames = totalLoopFrames * settings.loops;
   const totalFrames = totalContentFrames + (settings.stamp ? STAMP_FRAMES : 0);
 
-  // Start MediaRecorder
-  const stream = canvas.captureStream(FPS);
-  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-    ? 'video/webm;codecs=vp9'
-    : 'video/webm';
-
-  const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
+  // Start MediaRecorder — probar mimeTypes de mayor a menor compatibilidad
+  let stream, recorder;
+  try {
+    stream = canvas.captureStream(FPS);
+    const mimeTypes = [
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+    ];
+    const mimeType = mimeTypes.find(m => MediaRecorder.isTypeSupported(m)) || '';
+    recorder = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond: 6000000 } : {});
+  } catch(e) {
+    progressLabel.textContent = '⚠ Error: ' + e.message;
+    document.getElementById('btn-render').disabled = false;
+    document.getElementById('btn-preview').disabled = false;
+    isRecording = false;
+    return;
+  }
   const chunks = [];
   recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
@@ -864,7 +875,6 @@ async function startRender() {
     document.getElementById('download-name').textContent = name;
 
     progressWrap.style.display = 'none';
-    document.getElementById('convert-wrap').style.display = 'none';
     document.getElementById('download-wrap').style.display = 'flex';
     document.getElementById('btn-preview').disabled = false;
     document.getElementById('btn-render').disabled = false;
