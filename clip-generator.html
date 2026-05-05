@@ -356,6 +356,27 @@
     color: var(--muted);
     letter-spacing: .5px;
   }
+
+  /* ── Logo position buttons ── */
+  .pos-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 10px;
+    padding: 8px 6px;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: center;
+    letter-spacing: .3px;
+  }
+  .pos-btn:hover { color: var(--text); border-color: var(--accent2); }
+  .pos-btn.active {
+    background: rgba(114,165,212,.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
   .info-chip span { color: var(--accent); }
 </style>
 </head>
@@ -429,6 +450,28 @@
           <div class="toggle-box">✓</div>
           <span>Sello de marca</span>
         </label>
+      </div>
+    </div>
+
+    <!-- Logo watermark -->
+    <div class="card">
+      <div class="card-title">🔖 Logo en video</div>
+      <div style="margin-bottom:10px;">
+        <label class="toggle-item">
+          <input type="checkbox" id="toggle-logo">
+          <div class="toggle-box">✓</div>
+          <span>Mostrar logo en video</span>
+        </label>
+      </div>
+      <div id="logo-pos-wrap" style="display:none;">
+        <div class="ctrl-label" style="margin-bottom:6px;">Posición</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;" id="logo-pos-grid">
+          <button class="pos-btn" data-pos="top-left">↖ Sup. izq.</button>
+          <button class="pos-btn" data-pos="top-right" style="grid-column:3;">↗ Sup. der.</button>
+          <button class="pos-btn active" data-pos="center" style="grid-column:2; grid-row:2;">· Centro</button>
+          <button class="pos-btn" data-pos="bottom-left" style="grid-column:1; grid-row:3;">↙ Inf. izq.</button>
+          <button class="pos-btn" data-pos="bottom-right" style="grid-column:3; grid-row:3;">↘ Inf. der.</button>
+        </div>
       </div>
     </div>
 
@@ -513,6 +556,8 @@ let settings = {
   flash: false,
   gradient: false,
   stamp: false,
+  logo: false,
+  logoPos: 'center',
 };
 
 let previewAnim = null;
@@ -639,6 +684,21 @@ document.getElementById('loops-seg').addEventListener('click', (e) => {
   });
 });
 
+// Toggle logo
+document.getElementById('toggle-logo').addEventListener('change', (e) => {
+  settings.logo = e.target.checked;
+  document.getElementById('logo-pos-wrap').style.display = e.target.checked ? 'block' : 'none';
+});
+
+// Logo position buttons
+document.getElementById('logo-pos-grid').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pos-btn');
+  if (!btn) return;
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  settings.logoPos = btn.dataset.pos;
+});
+
 // ─────────────────────────────────────────────
 //  CANVAS DRAW
 // ─────────────────────────────────────────────
@@ -701,12 +761,40 @@ function drawFrame(frame) {
     }
   }
 
+  // ── Logo watermark ──
+  if (settings.logo && frame < totalContentFrames) {
+    drawLogoWatermark(settings.logoPos);
+  }
+
   // ── Stamp ──
   if (settings.stamp && frame >= stampStart) {
     drawStamp(frame - stampStart);
   }
 
   return totalFrames;
+}
+
+// ── Logo watermark helper ──────────────────────
+function drawLogoWatermark(pos) {
+  if (!logoImg.complete || !logoImg.naturalWidth) return;
+  const PAD = 36;
+  const logoW = 160;
+  const logoH = (logoImg.naturalHeight / logoImg.naturalWidth) * logoW;
+  let x, y;
+  switch (pos) {
+    case 'top-left':     x = PAD;                  y = PAD; break;
+    case 'top-right':    x = CANVAS_W - logoW - PAD; y = PAD; break;
+    case 'bottom-left':  x = PAD;                  y = CANVAS_H - logoH - PAD; break;
+    case 'bottom-right': x = CANVAS_W - logoW - PAD; y = CANVAS_H - logoH - PAD; break;
+    case 'center':
+    default:
+      x = (CANVAS_W - logoW) / 2;
+      y = (CANVAS_H - logoH) / 2;
+  }
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  ctx.drawImage(logoImg, x, y, logoW, logoH);
+  ctx.restore();
 }
 
 function drawImageCover(ctx, img, x, y, w, h) {
